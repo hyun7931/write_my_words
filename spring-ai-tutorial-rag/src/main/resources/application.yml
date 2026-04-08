@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: spring-ai-tutorial
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      embedding:
+        options:
+          model: text-embedding-3-small
+
+    vectorstore:
+      qdrant:
+        host: localhost
+        port: 6334
+        collection-name: my_documents
+        use-tls: false
+        initialize-schema: true
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+server:
+  port: 8080
+
+springdoc:
+  api-docs:
+    path: /api-docs
+
+logging:
+  level:
+    com.example.spring_ai_tutorial: DEBUG
+
+app:
+  document:
+    base-path: ./file
+    state-file: ./file/.index-state.json
