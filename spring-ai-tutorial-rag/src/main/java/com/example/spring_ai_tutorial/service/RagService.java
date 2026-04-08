@@ -101,7 +101,7 @@ public class RagService {
         // -> 나중에 검색 결과에서 "어떤 파일에서 나온 내용인지"와 같은 출처를 표시하는 용도로 사용 가능
         Map<String, Object> docMetadata = new HashMap<>();
         docMetadata.put("originalFilename", originalFilename != null ? originalFilename : "");
-        docMetadata.put("uploadTime", System.currentTimeMillis());
+        docMetadata.put("uploadTime", String.valueOf(System.currentTimeMillis()));
 
         try {
             // [Step 3 ~ 5] InMemoryDocumentVectorStore에 위임하여 PDF 텍스트 추출 → 청킹 → 임베딩 → 저장을 순차 처리
