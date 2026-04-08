@@ -7,6 +7,14 @@ import ChatWindow from './components/ChatWindow';
 import ChatInput from './components/ChatInput';
 import Sidebar from './components/Sidebar';
 
+// HTTP에서도 안전하게 ID 생성
+const generateId = () => {
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+  return Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+};
+
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,8 +34,9 @@ export default function Home() {
   }, [fetchFolders]);
 
   const handleSend = async (content: string, useRag: boolean) => {
+    // 1. 사용자 메시지 ID 생성 (수정됨)
     const userMsg: Message = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       role: 'user',
       content,
     };
@@ -39,16 +48,18 @@ export default function Home() {
 
       if (useRag) {
         const res = await ragQuery(content);
+        // 2. RAG 응답 메시지 ID 생성 (수정됨)
         assistantMsg = {
-          id: crypto.randomUUID(),
+          id: generateId(),
           role: 'assistant',
           content: res.answer,
           sources: res.relevantDocuments,
         };
       } else {
         const answer = await directChat(content);
+        // 3. 일반 채팅 응답 메시지 ID 생성 (수정됨)
         assistantMsg = {
-          id: crypto.randomUUID(),
+          id: generateId(),
           role: 'assistant',
           content: answer,
         };
@@ -56,8 +67,9 @@ export default function Home() {
 
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (e) {
+      // 4. 에러 메시지 ID 생성 (수정됨)
       const errorMsg: Message = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         role: 'assistant',
         content: `오류가 발생했습니다: ${e instanceof Error ? e.message : '알 수 없는 오류'}`,
       };
@@ -68,9 +80,7 @@ export default function Home() {
   };
 
   return (
-    // flex-1을 주어 부모(body)의 전체 높이를 차지하게 합니다.
     <div className="flex flex-1 h-full bg-zinc-50 dark:bg-zinc-950 overflow-hidden">
-      {/* 사이드바도 내부에서 스크롤이 되도록 설정되어 있어야 합니다 */}
       <Sidebar folders={folders} onRefresh={fetchFolders} />
 
       <div className="flex flex-col flex-1 min-w-0 h-full">
@@ -81,12 +91,10 @@ export default function Home() {
           <p className="text-xs text-zinc-400 mt-0.5">문서 기반 AI 채팅</p>
         </header>
 
-        {/* ChatWindow가 이 사이 공간을 꽉 채워야 합니다 */}
         <main className="flex-1 overflow-hidden flex flex-col min-h-0">
-           <ChatWindow messages={messages} isLoading={isLoading} />
+          <ChatWindow messages={messages} isLoading={isLoading} />
         </main>
 
-        {/* 하단 입력창 영역 */}
         <footer className="p-4 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-700">
           <ChatInput onSend={handleSend} isLoading={isLoading} />
         </footer>
