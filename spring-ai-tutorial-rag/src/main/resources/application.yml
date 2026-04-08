@@ -11,8 +11,8 @@ spring:
 
     vectorstore:
       qdrant:
-        host: localhost
-        port: 6334
+        host: ${QDRANT_HOST:qdrant}
+        port: ${QDRANT_PORT:6334}
         collection-name: my_documents
         use-tls: false
         initialize-schema: true
